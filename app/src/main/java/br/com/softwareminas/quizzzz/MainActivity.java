@@ -2,10 +2,13 @@ package br.com.softwareminas.quizzzz;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -20,9 +23,12 @@ import org.json.JSONObject;
 import java.util.Random;
 
 import br.com.softwareminas.quizzzz.thread.TConsultaAPI;
+import br.com.softwareminas.quizzzz.util.ConexaoHttpClient;
 
 public class MainActivity extends AppCompatActivity {
 
+    Context context;
+    int respostacorreta;
     int acertos;
     int numeropergunta;
     JSONObject jsonresposta;
@@ -31,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        preparatelainicial();
+        context = this;
 
 
     }
@@ -95,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void montapergunta(){
         Random random = new Random();
-        int respostacorreta = random.nextInt(4) + 1;
+        respostacorreta = random.nextInt(4) + 1;
 
         TextView lbnumquestao = findViewById(R.id.fmQuestao_lbnumquestao);
         TextView lbpergunta = findViewById(R.id.fmQuestao_lbpergunta);
@@ -105,31 +113,56 @@ public class MainActivity extends AppCompatActivity {
         Button bt3 = findViewById(R.id.fmQuestao_btresp3);
         Button bt4 = findViewById(R.id.fmQuestao_btresp4);
 
+        bt3.setVisibility(View.VISIBLE);
+        bt4.setVisibility(View.VISIBLE);
+
         lbnumquestao.setText("Questão "+String.valueOf(numeropergunta)+"/10");
 
         JSONObject questao;
         try {
             questao = respostas.getJSONObject(numeropergunta-1);
-            lbpergunta.setText(questao.getString("question"));
+            lbpergunta.setText(Html.fromHtml(questao.getString("question"), Html.FROM_HTML_MODE_LEGACY).toString());
+
+            if (questao.getString("type").equals("boolean")){
+                bt3.setVisibility(View.INVISIBLE);
+                bt4.setVisibility(View.INVISIBLE);
+
+                respostacorreta = random.nextInt(2) + 1;
+            }
+            Log.i("Pergunta",Html.fromHtml(questao.getString("question"), Html.FROM_HTML_MODE_LEGACY).toString());
+            Log.i("Tipo",questao.getString("type"));
+            Log.i("Resposta correta",String.valueOf(respostacorreta)+" - "+questao.getString("correct_answer"));
+
 
             JSONArray incorrectAnswersArray = questao.getJSONArray("incorrect_answers");
 
 
             bt1.setText(incorrectAnswersArray.getString(0));
-            bt2.setText(incorrectAnswersArray.getString(1));
-            bt3.setText(incorrectAnswersArray.getString(2));
+            if (questao.getString("type").equals("multiple")) {
+                bt2.setText(incorrectAnswersArray.getString(1));
+                bt3.setText(incorrectAnswersArray.getString(2));
+            }
 
             switch (respostacorreta){
                 case 1:
-                    bt4.setText(incorrectAnswersArray.getString(0));
+                    if (questao.getString("type").equals("boolean")) {
+                        bt2.setText(incorrectAnswersArray.getString(0));
+                    }else {
+                        bt4.setText(incorrectAnswersArray.getString(0));
+                    }
                     bt1.setText(questao.getString("correct_answer"));
                     break;
                 case 2:
-                    bt4.setText(incorrectAnswersArray.getString(1));
                     bt2.setText(questao.getString("correct_answer"));
+                    if (questao.getString("type").equals("boolean")) {
+                        bt1.setText(incorrectAnswersArray.getString(1));
+                    }else{
+                        bt4.setText(incorrectAnswersArray.getString(1));
+                    }
+
                     break;
                 case 3:
-                    bt4.setText(incorrectAnswersArray.getString(3));
+                    bt4.setText(incorrectAnswersArray.getString(2));
                     bt3.setText(questao.getString("correct_answer"));
                     break;
                 case 4:
@@ -183,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void handleMessage(Message msg) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
+
                 switch (msg.arg1) {
                     case 1000:
                         pDialog.dismiss();
@@ -209,6 +242,7 @@ public class MainActivity extends AppCompatActivity {
                             case 12:msgresposta="Retorno inválido do site";break;
                         }
 
+                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
                         builder.setMessage("Não foi possível concluir a operação! \n "+msgresposta);
                         builder.setCancelable(false);
                         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -217,10 +251,11 @@ public class MainActivity extends AppCompatActivity {
                                 dialog.dismiss();
                             }
                         });
+                        AlertDialog alert = builder.create();
+                        alert.show();
 
                 }
-                AlertDialog alert = builder.create();
-                alert.show();
+
             }
         };
         TConsultaAPI thread = new TConsultaAPI(handler);

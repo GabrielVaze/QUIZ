@@ -4,6 +4,7 @@ package br.com.softwareminas.quizzzz.thread;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.Html;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,6 +30,7 @@ public class TConsultaAPI extends Thread{
         Message msg;
         try {
             resposta = ConexaoHttpClient.executaHttpGet(url).toString();
+
         } catch (Exception e) {
             msg = new Message();
             msg.arg1 = 10;//falha de navegação

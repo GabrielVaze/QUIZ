@@ -34,16 +34,25 @@
         android:layout_height="wrap_content"
         android:text="Resposta 1"
         android:id="@+id/fmQuestao_btresp1"/>
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"/>
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Resposta 2"
         android:id="@+id/fmQuestao_btresp2"/>
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"/>
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Resposta 3"
         android:id="@+id/fmQuestao_btresp3"/>
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"/>
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -60,10 +69,10 @@
         android:layout_height="wrap_content">
 
         <Button
+            android:id="@+id/fmQuestao_btiniciar"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Cancelar"
-            android:id="@+id/fmQuestao_btiniciar"/>
+            android:layout_height="match_parent"
+            android:text="Cancelar" />
 
     </LinearLayout>
 
