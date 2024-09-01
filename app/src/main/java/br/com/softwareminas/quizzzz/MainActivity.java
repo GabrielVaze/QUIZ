@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     bt1.setText(questao.getString("correct_answer"));
                     break;
-                case 2:
+                case 2: //so para tirar a mensagem errada de commit XD
                     bt2.setText(questao.getString("correct_answer"));
                     if (questao.getString("type").equals("boolean")) {
                         bt1.setText(incorrectAnswersArray.getString(1));
